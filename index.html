@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            window.scripts = [];
+        </script>
+        <style>
+
+            body,html {
+                background: #282d32;
+                color: #fff;
+                font-family: sans-serif;
+                margin: 0
+            }
+            /* 居中 */
+            .ImageComparer {
+                overflow: hidden;
+                z-index: 11;
+                background: #282d32;
+                text-align: center;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -webkit-user-select: none;
+                user-select: none
+            }
+            /* 放大 */
+            .ImageComparer.zoom .box .before img,.ImageComparer.zoom .box img.after {
+                transform: scale(3);
+                image-rendering: pixelated;
+                max-width: unset
+            }
+
+            .ImageComparer .box {
+                position: relative;
+                display: inline-block;
+                font-size: 20px;
+                line-height: 100%;
+                overflow: hidden;
+                background-color: #202428
+            }
+
+            .ImageComparer .box img {
+                display: block;
+                width: auto;
+                max-height: calc(100vh - 100px);
+                object-fit: cover
+            }
+
+            .ImageComparer .box img.after {
+                width: 100%
+            }
+
+            .ImageComparer .box .description {
+                position: absolute;
+                z-index: 10;
+                bottom: 10px;
+                left: 20px;
+                white-space: nowrap;
+                color: #fff;
+                text-shadow: -1px -1px 2px #000,1px 1px 2px #000
+            }
+
+            .ImageComparer .box .controls {
+                position: absolute;
+                z-index: 10;
+                bottom: 10px;
+                right: 15px
+            }
+
+            .ImageComparer .box .controls a {
+                display: inline-block;
+                padding: 10px 11px;
+                text-decoration: none;
+                white-space: nowrap;
+                fill: #333;
+                box-shadow: 1px 1px 4px #000;
+                background: #fff;
+                border-radius: 9999px
+            }
+
+            .ImageComparer .box .controls a.fullscreen-exit,.ImageComparer .box .controls a.zoom-out {
+                display: none
+            }
+
+            .ImageComparer .box .controls a svg {
+                width: 24px;
+                height: 24px
+            }
+
+            .ImageComparer .box .slider {
+                position: absolute;
+                z-index: 9;
+                top: 0;
+                right: calc(50% - 1px);
+                bottom: 0;
+                width: 2px;
+                background-color: rgba(255,255,255,.5);
+                border-top: 0;
+                border-bottom: 0;
+                box-shadow: 0 0 2px rgba(0,0,0,.5)
+            }
+
+            .ImageComparer .box .slider button {
+                position: absolute;
+                top: calc(50% - 40px);
+                left: -4px;
+                width: 10px;
+                background-color: #ddd;
+                border: 4px solid #fff;
+                height: 80px;
+                text-align: center;
+                padding: 0;
+                outline: 0;
+                cursor: ew-resize;
+                box-shadow: 0 0 2px rgba(0,0,0,.5)
+            }
+
+            .ImageComparer .box .slider button:hover {
+                background-color: #777
+            }
+
+            .ImageComparer .box .slider .afterDescription,.ImageComparer .box .slider .beforeDescription {
+                position: absolute;
+                white-space: nowrap;
+                color: #fff;
+                text-shadow: -1px -1px 2px #000,1px 1px 2px #000;
+                text-align: left
+            }
+
+            .ImageComparer .box .slider .afterDescription select,.ImageComparer .box .slider .beforeDescription select {
+                padding: 5px 10px;
+                border: 0;
+                border-radius: 0;
+                font-size: 16px
+            }
+
+            .ImageComparer .box .slider .beforeDescription {
+                top: 10px;
+                right: 20px
+            }
+
+            .ImageComparer .box .slider .afterDescription {
+                top: 10px;
+                right: -520px;
+                width: 500px
+            }
+
+            .ImageComparer .box .before {
+                position: absolute;
+                z-index: 8;
+                top: 0;
+                left: 0;
+                right: 50%;
+                bottom: 0;
+                overflow: hidden
+            }
+
+            .ImageComparer .box .before img {
+                height: 100%;
+                max-width: 100%;
+                object-position: left
+            }
+
+            .ImageComparer.sliding .afterDescription,.ImageComparer.sliding .beforeDescription,.ImageComparer.sliding .controls,.ImageComparer.sliding .description {
+                opacity: .5
+            }
+
+            .ImageComparer.sliding .slider button {
+                opacity: 0
+            }
+
+            .ImageComparer:-webkit-full-screen {
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                position: absolute
+            }
+
+            .ImageComparer:-webkit-full-screen .box {
+                max-height: 100%
+            }
+
+            .ImageComparer:-webkit-full-screen .before img,.ImageComparer:-webkit-full-screen img.after {
+                max-width: none;
+                width: 100vw;
+                height: 100vh;
+                max-height: none;
+                object-fit: contain;
+                object-position: center
+            }
+
+            .ImageComparer:-webkit-full-screen .controls a.fullscreen {
+                display: none
+            }
+
+            .ImageComparer:-webkit-full-screen .controls a.fullscreen-exit {
+                display: inline-block
+            }
+
+            .ImageComparer.zoom .controls a.zoom-in {
+                display: none
+            }
+
+            .ImageComparer.zoom .controls a.zoom-out {
+                display: inline-block
+            }
+        </style>
+    </head>
+    <body>
+                <div class="ImageComparer" style="min-height: min(878px, 100vw / 2);">
+                    <div class="box">
+                        <div class="description">Rise of the Tomb Raider - ReShade test</div>
+                        <div class="controls">
+                            <a href="#" class="zoom-in" title="toggle zoom">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                                    <path d="M0 14.304q0-5.92 4.192-10.112t10.112-4.192 10.176 4.192 4.192 10.112q0 4.512-2.624 8.192l5.952 5.952-3.552 3.552-5.952-5.952q-3.68 2.624-8.192 2.624-5.92 0-10.112-4.192t-4.192-10.176zM4.064 14.304q0 4.256 3.008 7.264t7.232 2.976 7.264-2.976 3.008-7.264-3.008-7.2-7.264-2.976-7.232 2.976-3.008 7.2zM8.192 16.384v-4.064h4.128v-4.128h4.064v4.128h4.128v4.064h-4.128v4.128h-4.064v-4.128h-4.128z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="zoom-out" title="toggle zoom">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                                    <path d="M0 14.304q0-5.92 4.192-10.112t10.112-4.192 10.176 4.192 4.192 10.112q0 4.512-2.624 8.192l5.952 5.952-3.552 3.552-5.952-5.952q-3.68 2.624-8.192 2.624-5.92 0-10.112-4.192t-4.192-10.176zM4.064 14.304q0 4.256 3.008 7.264t7.232 2.976 7.264-2.976 3.008-7.264-3.008-7.2-7.264-2.976-7.232 2.976-3.008 7.2zM8.192 16.384v-4.064h12.32v4.064h-12.32z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="fullscreen" title="toggle fullscreen">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                                    <path d="M4.576 20.576H0V32h11.424v-4.576H4.576v-6.848zM0 11.424h4.576V4.576h6.848V0H0v11.424zm27.424 16h-6.848V32H32V20.576h-4.576v6.848zM20.576 0v4.576h6.848v6.848H32V0H20.576z"/>
+                                </svg>
+                            </a>
+                            <a href="#" class="fullscreen-exit" title="toggle fullscreen">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                                    <path d="M0 25.152h6.848V32h4.576V20.576H0v4.576zM6.848 6.848H0v4.576h11.424V0H6.848v6.848zM20.576 32h4.576v-6.848H32v-4.576H20.576V32zm4.576-25.152V0h-4.576v11.424H32V6.848h-6.848z"/>
+                                </svg>
+                            </a>
+                        </div>
+                        <div class="slider">
+                            <button></button>
+                            <div class="beforeDescription">OFF</div>
+                            <div class="afterDescription">ON</div>
+                        </div>
+                        <div class="before">
+                            <img alt="OFF" data-lazy-src="/images/before.jpg" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210px%22%20height%3D%2210px%22%3E%3C%2Fsvg%3E"/>
+                        </div>
+                        <img alt="ON" class="after" src="/images/after.jpg"/>
+                    </div>
+                </div>
+                <script>
+                    window.scripts.push(function() {
+                        imgsli.slider(document.querySelectorAll(".ImageComparer"));
+                    });
+                </script>
+            </div>
+        </div>
+        <script>
+            window.requestAnimationFrame(function() {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "/bundling/main.js?v=pKQ8ASHNgnlsoDSsNYWPZ2tFPEIjVx2uoCPm0gmqUl8";
+                document.head.appendChild(script);
+
+                var srcItems = [].slice.call(document.querySelectorAll("[data-lazy-src]"));
+                for (var i = 0; i < srcItems.length; i++) {
+                    srcItems[i].setAttribute('src', srcItems[i].getAttribute("data-lazy-src"));
+                }
+            });
+        </script>
+    </body>
+</html>
